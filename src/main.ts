@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+import { installCli } from './install-cli'
 
 /**
  * The main function for the action.
@@ -7,18 +7,38 @@ import { wait } from './wait'
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const validInstallInputValues: Set<string> = new Set(['yes', 'no'])
+    const shouldInstallCli: string = core.getInput('install-cli')
+    const cliVersion: string = core.getInput('cli-version')
+    const shouldInstallLocalBinary: string = core.getInput(
+      'install-local-binary'
+    )
+    const localBinaryVersion: string = core.getInput('local-binary-version')
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    // Validate inputs
+    if (!validInstallInputValues.has(shouldInstallCli)) {
+      throw new Error(
+        `Invalid value for install-cli: ${shouldInstallCli}. Please specify either "yes" or "no".`
+      )
+    }
+    if (!validInstallInputValues.has(shouldInstallLocalBinary)) {
+      throw new Error(
+        `Invalid value for install-local-binary: ${shouldInstallLocalBinary}. Please specify either "yes" or "no".`
+      )
+    }
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    if (shouldInstallCli === 'yes') {
+      // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
+      core.debug(`Installing Oso Cloud CLI version: ${cliVersion}`)
+      await installCli(cliVersion)
+      //TODO: Get installed version back
+      core.setOutput('cli-version', 'latest')
+    }
+    if (shouldInstallLocalBinary === 'yes') {
+      core.debug(
+        `Installing Oso Cloud local binary version: ${localBinaryVersion}`
+      )
+    }
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

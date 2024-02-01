@@ -8,12 +8,14 @@
 
 import * as core from '@actions/core'
 import * as main from '../src/main'
+import * as installCli from '../src/install-cli'
 
+// Mock the install functions so we don't actually download and install things during tests
+const installCliMock: jest.SpyInstance = jest
+  .spyOn(installCli, 'installCli')
+  .mockImplementation()
 // Mock the action's main function
-const runMock = jest.spyOn(main, 'run')
-
-// Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
+const runMock: jest.SpyInstance = jest.spyOn(main, 'run')
 
 // Mock the GitHub Actions core library
 let debugMock: jest.SpyInstance
@@ -33,12 +35,18 @@ describe('action', () => {
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
   })
 
-  it('sets the time output', async () => {
+  it('sets the versions to install', async () => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case 'milliseconds':
-          return '500'
+        case 'install-cli':
+          return 'yes'
+        case 'install-local-binary':
+          return 'yes'
+        case 'cli-version':
+          return 'latest'
+        case 'local-binary-version':
+          return '1.2.3'
         default:
           return ''
       }
@@ -46,31 +54,33 @@ describe('action', () => {
 
     await main.run()
     expect(runMock).toHaveReturned()
+    expect(installCliMock).toHaveBeenCalled()
 
     // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
+    expect(debugMock).toHaveBeenNthCalledWith(
+      1,
+      'Installing Oso Cloud CLI version: latest'
+    )
     expect(debugMock).toHaveBeenNthCalledWith(
       2,
-      expect.stringMatching(timeRegex)
-    )
-    expect(debugMock).toHaveBeenNthCalledWith(
-      3,
-      expect.stringMatching(timeRegex)
-    )
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      expect.stringMatching(timeRegex)
+      'Installing Oso Cloud local binary version: 1.2.3'
     )
     expect(errorMock).not.toHaveBeenCalled()
+    expect(setOutputMock).toHaveBeenCalledTimes(1)
   })
 
-  it('sets a failed status', async () => {
+  it('sets a failed status on an invalid install-cli input', async () => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case 'milliseconds':
-          return 'this is not a number'
+        case 'install-cli':
+          return 'maybe'
+        case 'install-local-binary':
+          return 'yes'
+        case 'cli-version':
+          return 'latest'
+        case 'local-binary-version':
+          return '1.2.3'
         default:
           return ''
       }
@@ -82,8 +92,38 @@ describe('action', () => {
     // Verify that all of the core library functions were called correctly
     expect(setFailedMock).toHaveBeenNthCalledWith(
       1,
-      'milliseconds not a number'
+      'Invalid value for install-cli: maybe. Please specify either "yes" or "no".'
     )
     expect(errorMock).not.toHaveBeenCalled()
+    expect(setOutputMock).not.toHaveBeenCalledTimes(1)
+  })
+
+  it('sets a failed status on an invalid install-local-binary input', async () => {
+    // Set the action's inputs as return values from core.getInput()
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'install-cli':
+          return 'yes'
+        case 'install-local-binary':
+          return 'maybe'
+        case 'cli-version':
+          return 'latest'
+        case 'local-binary-version':
+          return '1.2.3'
+        default:
+          return ''
+      }
+    })
+
+    await main.run()
+    expect(runMock).toHaveReturned()
+
+    // Verify that all of the core library functions were called correctly
+    expect(setFailedMock).toHaveBeenNthCalledWith(
+      1,
+      'Invalid value for install-local-binary: maybe. Please specify either "yes" or "no".'
+    )
+    expect(errorMock).not.toHaveBeenCalled()
+    expect(setOutputMock).not.toHaveBeenCalledTimes(1)
   })
 })
