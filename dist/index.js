@@ -3991,40 +3991,30 @@ const exec = __importStar(__nccwpck_require__(514));
  * @param version The version of the CLI to install.
  * @returns {Promise<string>} The version of the CLI that was installed.
  */
-async function installCli(version = 'latest') {
-    let installOutput = '';
-    let installError = '';
-    let versionOutput = '';
-    let versionError = '';
-    const installOptions = {};
-    const versionOptions = {};
-    versionOptions.listeners = {
+async function installCli() {
+    let output = '';
+    let error = '';
+    const options = {};
+    options.listeners = {
         stdout: (data) => {
-            versionOutput += data.toString();
+            output += data.toString();
         },
         stderr: (data) => {
-            versionError += data.toString();
+            error += data.toString();
         }
     };
-    installOptions.listeners = {
-        stdout: (data) => {
-            installOutput += data.toString();
-        },
-        stderr: (data) => {
-            installError += data.toString();
-        }
-    };
-    await exec.exec('/bin/bash', ['-c', 'curl -L https://cloud.osohq.com/install.sh | /bin/bash'], installOptions);
-    await exec.exec('oso-cloud', ['version'], versionOptions);
-    return new Promise(resolve => {
-        core.debug(`requested version: ${version}`);
-        core.debug(`install stdout: \n${installOutput}`);
-        core.debug(`install stderr: \n${installError}`);
-        core.debug(`version stdout: \n${versionOutput}`);
-        core.debug(`version stderr: \n${versionError}`);
-        core.setOutput('version', versionOutput);
-        resolve(versionOutput);
-    });
+    // install the CLI using the install script hosted at cloud.osohq.com
+    await exec.exec('/bin/bash', ['-c', 'curl -L https://cloud.osohq.com/install.sh | /bin/bash'], options);
+    core.debug(`stdout from installation: \n${output}`);
+    core.debug(`stderr from installation: \n${error}`);
+    // clear the output and error for the next command
+    output = '';
+    error = '';
+    // get the version that was installed so it can be set in the action output
+    await exec.exec('oso-cloud', ['version'], options);
+    core.debug(`stdout from version check: \n${output}`);
+    core.debug(`stderr from version check: \n${error}`);
+    return output.split(' ')[3];
 }
 exports.installCli = installCli;
 
@@ -4071,9 +4061,7 @@ async function run() {
     try {
         const validInstallInputValues = new Set(['yes', 'no']);
         const shouldInstallCli = core.getInput('install-cli');
-        const cliVersion = core.getInput('cli-version');
         const shouldInstallLocalBinary = core.getInput('install-local-binary');
-        const localBinaryVersion = core.getInput('local-binary-version');
         // Validate inputs
         if (!validInstallInputValues.has(shouldInstallCli)) {
             throw new Error(`Invalid value for install-cli: ${shouldInstallCli}. Please specify either "yes" or "no".`);
@@ -4083,13 +4071,13 @@ async function run() {
         }
         if (shouldInstallCli === 'yes') {
             // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-            core.debug(`Installing Oso Cloud CLI version: ${cliVersion}`);
-            await (0, install_cli_1.installCli)(cliVersion);
+            core.debug('Installing Oso Cloud CLI');
+            const cliVersion = await (0, install_cli_1.installCli)();
             //TODO: Get installed version back
-            core.setOutput('cli-version', 'latest');
+            core.setOutput('cli-version', cliVersion);
         }
         if (shouldInstallLocalBinary === 'yes') {
-            core.debug(`Installing Oso Cloud local binary version: ${localBinaryVersion}`);
+            core.debug('Installing Oso Cloud local binary');
         }
     }
     catch (error) {

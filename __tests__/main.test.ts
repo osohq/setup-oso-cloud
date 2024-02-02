@@ -43,10 +43,6 @@ describe('action', () => {
           return 'yes'
         case 'install-local-binary':
           return 'yes'
-        case 'cli-version':
-          return 'latest'
-        case 'local-binary-version':
-          return '1.2.3'
         default:
           return ''
       }
@@ -57,13 +53,10 @@ describe('action', () => {
     expect(installCliMock).toHaveBeenCalled()
 
     // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(
-      1,
-      'Installing Oso Cloud CLI version: latest'
-    )
+    expect(debugMock).toHaveBeenNthCalledWith(1, 'Installing Oso Cloud CLI')
     expect(debugMock).toHaveBeenNthCalledWith(
       2,
-      'Installing Oso Cloud local binary version: 1.2.3'
+      'Installing Oso Cloud local binary'
     )
     expect(errorMock).not.toHaveBeenCalled()
     expect(setOutputMock).toHaveBeenCalledTimes(1)
@@ -77,10 +70,6 @@ describe('action', () => {
           return 'maybe'
         case 'install-local-binary':
           return 'yes'
-        case 'cli-version':
-          return 'latest'
-        case 'local-binary-version':
-          return '1.2.3'
         default:
           return ''
       }
@@ -106,10 +95,6 @@ describe('action', () => {
           return 'yes'
         case 'install-local-binary':
           return 'maybe'
-        case 'cli-version':
-          return 'latest'
-        case 'local-binary-version':
-          return '1.2.3'
         default:
           return ''
       }

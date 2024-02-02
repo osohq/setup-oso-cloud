@@ -9,11 +9,9 @@ export async function run(): Promise<void> {
   try {
     const validInstallInputValues: Set<string> = new Set(['yes', 'no'])
     const shouldInstallCli: string = core.getInput('install-cli')
-    const cliVersion: string = core.getInput('cli-version')
     const shouldInstallLocalBinary: string = core.getInput(
       'install-local-binary'
     )
-    const localBinaryVersion: string = core.getInput('local-binary-version')
 
     // Validate inputs
     if (!validInstallInputValues.has(shouldInstallCli)) {
@@ -29,15 +27,13 @@ export async function run(): Promise<void> {
 
     if (shouldInstallCli === 'yes') {
       // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-      core.debug(`Installing Oso Cloud CLI version: ${cliVersion}`)
-      await installCli(cliVersion)
+      core.debug('Installing Oso Cloud CLI')
+      const cliVersion = await installCli()
       //TODO: Get installed version back
-      core.setOutput('cli-version', 'latest')
+      core.setOutput('cli-version', cliVersion)
     }
     if (shouldInstallLocalBinary === 'yes') {
-      core.debug(
-        `Installing Oso Cloud local binary version: ${localBinaryVersion}`
-      )
+      core.debug('Installing Oso Cloud local binary')
     }
   } catch (error) {
     // Fail the workflow run if an error occurs

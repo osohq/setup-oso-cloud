@@ -1,32 +1,21 @@
-name: 'Install OSO Cloud tools'
-description: 'Installs the OSO Cloud CLI (required to validate syntax and deploy .polar files to OSO cloud) and the OSO Cloud local binary (required to run policy tests) to the runner.'
+name: 'Install OSO Cloud client tools'
+description: 'Installs the latest verstions of the OSO Cloud CLI and the OSO Cloud local binary to the runner.'
 author: 'Oso'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
-  color: 'red'
+  icon: 'user-check'
+  color: 'purple'
 
-# Define your inputs here.
 inputs:
   install-cli:
     description: Whether or not to install the OSO Cloud CLI. Defaults to 'yes.'
     required: false
     default: 'yes'
-  cli-version:
-    description: The version of the OSO Cloud CLI to install. Defaults to 'latest'
-    required: false
-    default: 'latest'
   install-local-binary:
     description: Whether or not to install the OSO Cloud local binary. Defaults to 'yes.'
     required: false
     default: 'yes'
-  local-binary-version:
-    description: The version of the OSO Cloud local binary to install. Defaults to 'latest'
-    required: false
-    default: 'latest'
 
-# Define your outputs here.
 outputs:
   cli-version:
     description: 'The version of the OSO Cloud CLI that was installed'

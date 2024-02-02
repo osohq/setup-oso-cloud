@@ -8,49 +8,40 @@ import { ExecOptions } from '@actions/exec'
  * @param version The version of the CLI to install.
  * @returns {Promise<string>} The version of the CLI that was installed.
  */
-export async function installCli(version = 'latest'): Promise<string> {
-  let installOutput = ''
-  let installError = ''
-  let versionOutput = ''
-  let versionError = ''
+export async function installCli(): Promise<string> {
+  let output = ''
+  let error = ''
 
-  const installOptions: ExecOptions = {}
-  const versionOptions: ExecOptions = {}
+  const options: ExecOptions = {}
 
-  versionOptions.listeners = {
+  options.listeners = {
     stdout: (data: Buffer) => {
-      versionOutput += data.toString()
+      output += data.toString()
     },
     stderr: (data: Buffer) => {
-      versionError += data.toString()
+      error += data.toString()
     }
   }
 
-  installOptions.listeners = {
-    stdout: (data: Buffer) => {
-      installOutput += data.toString()
-    },
-    stderr: (data: Buffer) => {
-      installError += data.toString()
-    }
-  }
-
+  // install the CLI using the install script hosted at cloud.osohq.com
   await exec.exec(
     '/bin/bash',
     ['-c', 'curl -L https://cloud.osohq.com/install.sh | /bin/bash'],
-    installOptions
+    options
   )
-  await exec.exec('oso-cloud', ['version'], versionOptions)
 
-  return new Promise(resolve => {
-    core.debug(`requested version: ${version}`)
-    core.debug(`install stdout: \n${installOutput}`)
-    core.debug(`install stderr: \n${installError}`)
-    core.debug(`version stdout: \n${versionOutput}`)
-    core.debug(`version stderr: \n${versionError}`)
+  core.debug(`stdout from installation: \n${output}`)
+  core.debug(`stderr from installation: \n${error}`)
 
-    core.setOutput('version', versionOutput)
+  // clear the output and error for the next command
+  output = ''
+  error = ''
 
-    resolve(versionOutput)
-  })
+  // get the version that was installed so it can be set in the action output
+  await exec.exec('oso-cloud', ['version'], options)
+
+  core.debug(`stdout from version check: \n${output}`)
+  core.debug(`stderr from version check: \n${error}`)
+
+  return output.split(' ')[3]
 }
