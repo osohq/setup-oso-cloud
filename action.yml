@@ -1,5 +1,5 @@
 name: 'Install OSO Cloud client tools'
-description: 'Installs the latest verstions of the OSO Cloud CLI and the OSO Cloud local binary to the runner.'
+description: 'Installs the latest versions of the OSO Cloud CLI and local binary.'
 author: 'Oso'
 
 branding:
@@ -8,11 +8,11 @@ branding:
 
 inputs:
   install-cli:
-    description: Whether or not to install the OSO Cloud CLI. Defaults to 'yes.'
+    description: Whether or not to install the OSO Cloud CLI.
     required: false
     default: 'yes'
   install-local-binary:
-    description: Whether or not to install the OSO Cloud local binary. Defaults to 'yes.'
+    description: Whether or not to install the OSO Cloud local binary.
     required: false
     default: 'yes'
 
