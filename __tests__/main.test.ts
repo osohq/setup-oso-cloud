@@ -10,10 +10,14 @@ import * as core from '@actions/core'
 import * as main from '../src/main'
 import * as installCli from '../src/install-cli'
 
-// Mock the install functions so we don't actually download and install things during tests
+// Mock the install function so we don't actually download and install things during tests.
+// Just return a string in the expected format
+// (i.e. output from `oso-cloud validate`).
 const installCliMock: jest.SpyInstance = jest
   .spyOn(installCli, 'installCli')
-  .mockImplementation()
+  .mockImplementation(async () => {
+    return 'version: 0.12.5 sha: a21efc6a98e3bb73789148d2decb6a0eaf77d20f'
+  })
 // Mock the action's main function
 const runMock: jest.SpyInstance = jest.spyOn(main, 'run')
 
@@ -35,7 +39,7 @@ describe('action', () => {
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
   })
 
-  it('sets the versions to install', async () => {
+  it('assigns the CLI version and SHA to the correct outputs.', async () => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
@@ -49,17 +53,25 @@ describe('action', () => {
     })
 
     await main.run()
+
+    // Verify that all core library functions
+    // and custom action functions were called correctly
     expect(runMock).toHaveReturned()
+    expect(errorMock).not.toHaveBeenCalled()
+    expect(setFailedMock).not.toHaveBeenCalled()
     expect(installCliMock).toHaveBeenCalled()
 
-    // Verify that all of the core library functions were called correctly
     expect(debugMock).toHaveBeenNthCalledWith(1, 'Installing Oso Cloud CLI')
     expect(debugMock).toHaveBeenNthCalledWith(
       2,
       'Installing Oso Cloud local binary'
     )
-    expect(errorMock).not.toHaveBeenCalled()
-    expect(setOutputMock).toHaveBeenCalledTimes(1)
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'cli-version', '0.12.5')
+    expect(setOutputMock).toHaveBeenNthCalledWith(
+      2,
+      'cli-sha',
+      'a21efc6a98e3bb73789148d2decb6a0eaf77d20f'
+    )
   })
 
   it('sets a failed status on an invalid install-cli input', async () => {

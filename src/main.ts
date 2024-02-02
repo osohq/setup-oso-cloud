@@ -28,9 +28,10 @@ export async function run(): Promise<void> {
     if (shouldInstallCli === 'yes') {
       // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
       core.debug('Installing Oso Cloud CLI')
-      const cliVersion = await installCli()
+      const cliInfo = await installCli()
       //TODO: Get installed version back
-      core.setOutput('cli-version', cliVersion)
+      core.setOutput('cli-version', cliInfo.split(' ')[1])
+      core.setOutput('cli-sha', cliInfo.split(' ')[3])
     }
     if (shouldInstallLocalBinary === 'yes') {
       core.debug('Installing Oso Cloud local binary')

@@ -3988,8 +3988,7 @@ const exec = __importStar(__nccwpck_require__(514));
 /**
  * Installs the specified version ot the oso cloud CLI on the runner.
  * Defaults to the latest version
- * @param version The version of the CLI to install.
- * @returns {Promise<string>} The version of the CLI that was installed.
+ * @returns {Promise<string>} The output of 'oso-cloud version', which includes the version and SHA of the installed CLI.
  */
 async function installCli() {
     let output = '';
@@ -4014,7 +4013,8 @@ async function installCli() {
     await exec.exec('oso-cloud', ['version'], options);
     core.debug(`stdout from version check: \n${output}`);
     core.debug(`stderr from version check: \n${error}`);
-    return output.split(' ')[3];
+    // return the output of `oso-cloud version`
+    return output;
 }
 exports.installCli = installCli;
 
@@ -4072,9 +4072,10 @@ async function run() {
         if (shouldInstallCli === 'yes') {
             // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
             core.debug('Installing Oso Cloud CLI');
-            const cliVersion = await (0, install_cli_1.installCli)();
+            const cliInfo = await (0, install_cli_1.installCli)();
             //TODO: Get installed version back
-            core.setOutput('cli-version', cliVersion);
+            core.setOutput('cli-version', cliInfo.split(' ')[1]);
+            core.setOutput('cli-sha', cliInfo.split(' ')[3]);
         }
         if (shouldInstallLocalBinary === 'yes') {
             core.debug('Installing Oso Cloud local binary');

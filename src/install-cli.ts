@@ -5,8 +5,7 @@ import { ExecOptions } from '@actions/exec'
 /**
  * Installs the specified version ot the oso cloud CLI on the runner.
  * Defaults to the latest version
- * @param version The version of the CLI to install.
- * @returns {Promise<string>} The version of the CLI that was installed.
+ * @returns {Promise<string>} The output of 'oso-cloud version', which includes the version and SHA of the installed CLI.
  */
 export async function installCli(): Promise<string> {
   let output = ''
@@ -43,5 +42,6 @@ export async function installCli(): Promise<string> {
   core.debug(`stdout from version check: \n${output}`)
   core.debug(`stderr from version check: \n${error}`)
 
-  return output.split(' ')[3]
+  // return the output of `oso-cloud version`
+  return output
 }
