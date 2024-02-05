@@ -4079,6 +4079,8 @@ async function run() {
         }
         if (shouldInstallLocalBinary === 'yes') {
             core.debug('Installing Oso Cloud local binary');
+            const localBinaryInfo = await (0, install_cli_1.installCli)();
+            core.setOutput('local-binary-version', localBinaryInfo.split(':')[1]);
         }
     }
     catch (error) {

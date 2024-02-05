@@ -35,6 +35,8 @@ export async function run(): Promise<void> {
     }
     if (shouldInstallLocalBinary === 'yes') {
       core.debug('Installing Oso Cloud local binary')
+      const localBinaryInfo = await installCli()
+      core.setOutput('local-binary-version', localBinaryInfo.split(':')[1])
     }
   } catch (error) {
     // Fail the workflow run if an error occurs
