@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import { installCli } from './install-cli'
+import { installLocalBinary } from './install-local-binary'
 
 /**
  * The main function for the action.
@@ -35,7 +36,7 @@ export async function run(): Promise<void> {
     }
     if (shouldInstallLocalBinary === 'yes') {
       core.debug('Installing Oso Cloud local binary')
-      const localBinaryInfo = await installCli()
+      const localBinaryInfo = await installLocalBinary()
       core.setOutput('local-binary-version', localBinaryInfo.split(':')[1])
     }
   } catch (error) {
