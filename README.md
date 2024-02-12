@@ -14,6 +14,7 @@ See the documentation for each action for additional information about that acti
 
 Inputs: none
 Outputs:
+
 - cli-version: The version number of the CLI that was installed
 - cli-sha: The SHA of the CLI that was installed
 
