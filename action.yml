@@ -21,8 +21,6 @@ outputs:
     description: 'The version of the OSO Cloud CLI that was installed'
   cli-sha:
     description: 'The SHA of the OSO Cloud CLI that was installed'
-  local-binary-version:
-    description: 'The version of the OSO Cloud local binary that was installed'
 
 runs:
   using: node20
