@@ -4,7 +4,7 @@ Installs the
 [Oso Cloud CLI](https://www.osohq.com/docs/reference/client-apis/cli)
 on a GitHub actions runner.
 
-The CLI is required for the following Oso Cloud github actions:
+The CLI is required for the following Oso Cloud GitHub actions:
 
 - validate-polar-syntax (a wrapper for `oso-cloud validate`)
 - run-polar-tests (a wrapper for `oso-cloud test`)
