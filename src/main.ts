@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import { installCli } from './install-cli'
-import { installLocalBinary } from './install-local-binary'
 
 /**
  * The main function for the action.
@@ -10,19 +9,11 @@ export async function run(): Promise<void> {
   try {
     const validInstallInputValues: Set<string> = new Set(['yes', 'no'])
     const shouldInstallCli: string = core.getInput('install-cli')
-    const shouldInstallLocalBinary: string = core.getInput(
-      'install-local-binary'
-    )
 
     // Validate inputs
     if (!validInstallInputValues.has(shouldInstallCli)) {
       throw new Error(
         `Invalid value for install-cli: ${shouldInstallCli}. Please specify either "yes" or "no".`
-      )
-    }
-    if (!validInstallInputValues.has(shouldInstallLocalBinary)) {
-      throw new Error(
-        `Invalid value for install-local-binary: ${shouldInstallLocalBinary}. Please specify either "yes" or "no".`
       )
     }
 
@@ -33,11 +24,6 @@ export async function run(): Promise<void> {
       //TODO: Get installed version back
       core.setOutput('cli-version', cliInfo.split(' ')[1])
       core.setOutput('cli-sha', cliInfo.split(' ')[3])
-    }
-    if (shouldInstallLocalBinary === 'yes') {
-      core.debug('Installing Oso Cloud local binary')
-      const localBinaryInfo = await installLocalBinary()
-      core.setOutput('local-binary-version', localBinaryInfo.split(':')[1])
     }
   } catch (error) {
     // Fail the workflow run if an error occurs

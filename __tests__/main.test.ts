@@ -45,8 +45,6 @@ describe('action', () => {
       switch (name) {
         case 'install-cli':
           return 'yes'
-        case 'install-local-binary':
-          return 'yes'
         default:
           return ''
       }
@@ -62,10 +60,6 @@ describe('action', () => {
     expect(installCliMock).toHaveBeenCalled()
 
     expect(debugMock).toHaveBeenNthCalledWith(1, 'Installing Oso Cloud CLI')
-    expect(debugMock).toHaveBeenNthCalledWith(
-      2,
-      'Installing Oso Cloud local binary'
-    )
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'cli-version', '0.12.5')
     expect(setOutputMock).toHaveBeenNthCalledWith(
       2,
@@ -80,8 +74,6 @@ describe('action', () => {
       switch (name) {
         case 'install-cli':
           return 'maybe'
-        case 'install-local-binary':
-          return 'yes'
         default:
           return ''
       }
@@ -94,31 +86,6 @@ describe('action', () => {
     expect(setFailedMock).toHaveBeenNthCalledWith(
       1,
       'Invalid value for install-cli: maybe. Please specify either "yes" or "no".'
-    )
-    expect(errorMock).not.toHaveBeenCalled()
-    expect(setOutputMock).not.toHaveBeenCalledTimes(1)
-  })
-
-  it('sets a failed status on an invalid install-local-binary input', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation((name: string): string => {
-      switch (name) {
-        case 'install-cli':
-          return 'yes'
-        case 'install-local-binary':
-          return 'maybe'
-        default:
-          return ''
-      }
-    })
-
-    await main.run()
-    expect(runMock).toHaveReturned()
-
-    // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(
-      1,
-      'Invalid value for install-local-binary: maybe. Please specify either "yes" or "no".'
     )
     expect(errorMock).not.toHaveBeenCalled()
     expect(setOutputMock).not.toHaveBeenCalledTimes(1)

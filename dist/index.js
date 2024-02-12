@@ -4061,13 +4061,9 @@ async function run() {
     try {
         const validInstallInputValues = new Set(['yes', 'no']);
         const shouldInstallCli = core.getInput('install-cli');
-        const shouldInstallLocalBinary = core.getInput('install-local-binary');
         // Validate inputs
         if (!validInstallInputValues.has(shouldInstallCli)) {
             throw new Error(`Invalid value for install-cli: ${shouldInstallCli}. Please specify either "yes" or "no".`);
-        }
-        if (!validInstallInputValues.has(shouldInstallLocalBinary)) {
-            throw new Error(`Invalid value for install-local-binary: ${shouldInstallLocalBinary}. Please specify either "yes" or "no".`);
         }
         if (shouldInstallCli === 'yes') {
             // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
@@ -4076,11 +4072,6 @@ async function run() {
             //TODO: Get installed version back
             core.setOutput('cli-version', cliInfo.split(' ')[1]);
             core.setOutput('cli-sha', cliInfo.split(' ')[3]);
-        }
-        if (shouldInstallLocalBinary === 'yes') {
-            core.debug('Installing Oso Cloud local binary');
-            const localBinaryInfo = await (0, install_cli_1.installCli)();
-            core.setOutput('local-binary-version', localBinaryInfo.split(':')[1]);
         }
     }
     catch (error) {
