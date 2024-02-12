@@ -56,7 +56,6 @@ jobs:
         uses: ./
         with:
           install-cli: yes
-          install-local-binary: yes
 
       - name: Print Output
         id: output
